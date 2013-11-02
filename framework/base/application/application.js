@@ -233,6 +233,10 @@ module.exports = Cube.Class({
 					var autoloadType = type,
 						modules = [];
 
+					if (!_.isDir(path)) {
+						return modules;
+					}
+
 					if (isAppDir) {
 						type = 'users' + _.ucFirst(type);
 					}
