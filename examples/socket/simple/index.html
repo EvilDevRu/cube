@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+	<meta charset="utf-8">
+	<meta name="author" content="Юрченко Дмитрий">
+	<meta name="viewport" content="width=device-width">
+	
+	<title>Cubeframework - simple socket application example</title>
+	
+	<script src="http://yandex.st/jquery/1.9.1/jquery.min.js"></script>
+	<script src="http://yandex.st/jquery/cookie/1.0/jquery.cookie.min.js"></script>
+	<script src="http://localhost:3030/socket.io/socket.io.js"></script>
+	<script>
+		//$(function() {
+			var connections = [];
+
+			if (typeof io !== 'undefined') {
+				var hostName = window.location.hostname ?
+					window.location.hostname :
+					'localhost';
+
+				var params = navigator.userAgent.toLowerCase().indexOf('chrome') != -1 ?
+					{ transports: ['xhr-polling'] } :
+					null;
+
+				function NewConnection() {
+					var socket = io.connect('http://' + hostName + ':3030', params);
+					socket.on('connect', function() {
+						console.log('[socket] Successfully established a working connection!');
+
+						socket.emit('/index', { a: new Array(100).join('*') });
+					})
+					.on('connecting', function() {
+						console.log('[socket] Try connect to socket server');
+					})
+					.on('connect_failed', function() {
+						console.error('[socket] Connect to socket server is failed');
+					})
+					.on('error', function(error) {
+						console.error('[socket] Error', error);
+						socket.socket.reconnect();
+					})
+					.on('disconnect', function() {
+						console.error('[socket] You are disconnect');
+					});
+
+					return socket;
+				}
+
+				for (var i = 0; i < 100000; ++i) {
+					connections.push(NewConnection());
+				}
+			}
+		//});
+	</script>
+</head>
+<body>
+	<h1>Cubeframework - simple socket application example</h1>
+</body>
+</html>
