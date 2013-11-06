@@ -214,7 +214,7 @@ module.exports = Cube.Class({
 			 */
 			function(callback) {
 				var middlewares = [],
-					list = [
+					dirList = [
 						'components',
 						'middlewares',
 						'filters',
@@ -224,36 +224,37 @@ module.exports = Cube.Class({
 				/**
 				 * Load modules.
 				 *
-				 * @param {String} path
-				 * @param {String} type
-				 * @param {Boolean} isAppDir
+				 * @param {String} path to folder.
+				 * @param {String} type (components, middlewares etc.)
+				 * @param {Boolean} isUsersModules
 				 * @return {Array}
 				 */
-				var Load = function(path, type, isAppDir) {
-					var autoloadType = type,
-						modules = [];
+				var LoadModules = function(path, dir, isUsersModules) {
+					var modules = [];
 
 					if (!_.isDir(path)) {
 						return modules;
 					}
 
-					if (isAppDir) {
-						type = 'users' + _.ucFirst(type);
-					}
-
-					if (!Cube[ type ]) {
-						Cube[ type ] = {};
-					}
-
-					_.each(Cube.fs.readdirSync(path), function(file) {
-						var name = _.ucFirst(_.baseName(file, '.js')),
-							postfix = _.ucFirst(autoloadType).substr(0, autoloadType.length - 1),
+					/**
+					 * Load one module.
+					 *
+					 * @param path
+					 * @param fileName
+					 */
+					var LoadOneModule = function(path, fileName) {
+						var name = _.ucFirst(_.baseName(fileName, '.js')),
+							postfix = _.ucFirst(dir).substr(0, dir.length - 1),
 							moduleName = name + postfix,
-							state = Cube.app.config.autoload[ autoloadType ][ _.lcFirst(name) ];
+							isEnabled = Cube.app.config.autoload[ dir ][ _.lcFirst(name) ];
 
-						//	Check module state.
-						if (!_.isUndefined(state) && state === false) {
+						//	Check module enable state.
+						if (isEnabled === false) {
 							return;
+						}
+
+						if (isUsersModules) {
+							name = 'My' + _.ucFirst(name);
 						}
 
 						//	If module is exist, move he as parent.
@@ -261,31 +262,52 @@ module.exports = Cube.Class({
 							Cube[ name + 'Base' + postfix ] = Cube[ moduleName ];
 						}
 
-						Cube[ name + postfix ] = require(path + '/' + file);
-						modules.push(name + postfix);
+						Cube[ moduleName ] = require(path + '/' + fileName);
+						if (_.indexOf(modules, moduleName) === -1) {
+							modules.push(moduleName);
+						}
 
-						//	If is component and it have singleton pattern.
-						if (postfix === 'Component' && _.isFunction(Cube[ moduleName ].getInstance)) {
-							Cube.app[ _.lcFirst(name) ] = Cube[ moduleName ].getInstance();
+						//	If it have singleton pattern than move,
+						if (_.isFunction(Cube[ moduleName ].getInstance)) {
+							switch (postfix) {
+								case 'Component':
+									Cube.app[ _.lcFirst(name) ] = Cube[ moduleName ].getInstance();
+									break;
+
+								case 'Util':
+									Cube.utils[ _.lcFirst(name) ] = Cube[ moduleName ].getInstance();
+									break;
+							}
 						}
-						else if (postfix === 'Util' && _.isFunction(Cube[ moduleName ].getInstance)) {
-							Cube.utils[ _.lcFirst(name) ] = Cube[ moduleName ].getInstance();
+					};
+
+					//	Load from parent dir.
+					_.each(Cube.fs.readdirSync(path), function(file) {
+						var childPath = path + '/' + file;
+						if (_.isFile(childPath)) {
+							LoadOneModule(path, file);	//	Load file.
+							return;
 						}
+
+						//	Load from children dir.
+						_.each(Cube.fs.readdirSync(childPath), function(file) {
+							LoadOneModule(childPath, file);
+						});
 					});
 
 					return modules;
 				};
 
-				_.each(list, function(type) {
-					var corePath = Cube.getPathOfAlias('core.' + type) + '/' + Cube.app.getAppType(),
-						appPath = Cube.getPathOfAlias('app.' + type) + '/' + Cube.app.getAppType(),
-						modules = Load(corePath, type);
+				_.each(dirList, function(dirName) {
+					var corePath = Cube.getPathOfAlias('core.' + dirName),
+						appPath = Cube.getPathOfAlias('app.' + dirName),
+						modules = LoadModules(corePath, dirName);
 
 					if (_.isDir(appPath)) {
-						modules = _.merge(modules, Load(appPath, type, true));
+						modules = _.merge(modules, LoadModules(appPath, dirName, true));
 					}
 
-					if (type === 'middlewares') {
+					if (dirName === 'middlewares' && !_.isEmpty(modules)) {
 						middlewares = modules.reverse();
 					}
 				});
