@@ -107,13 +107,17 @@ var RequestMiddleware = Cube.Class({
 	 *
 	 * @param {Integer} status
 	 * @param {Mixed} data
+	 * @param {Boolean} isEnd true if end request
 	 */
-	send: function(status, data) {
+	send: function(status, data, isEnd) {
 		this.res.write(JSON.stringify({
 			status: status,
 			data: data
 		}));
-		this.res.end();
+
+		if (isEnd) {
+			this.res.end();
+		}
 	},
 
 	/**

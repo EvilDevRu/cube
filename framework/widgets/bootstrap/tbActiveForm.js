@@ -127,7 +127,7 @@ module.exports = Cube.Class({
 	},
 
 	/**
-	 * Select
+	 * Select row.
 	 *
 	 * @param params
 	 * @returns {string}
@@ -153,6 +153,33 @@ module.exports = Cube.Class({
 				'<div class="col-lg-4">' +
 					'<select class="form-control" name="' + name + '" id="' + id + '">' + html + '</select>' +
 					(params.hint ? ('<span class="help-block">' + params.hint + '</span>') : '') +
+				'</div>' +
+			'</div>';
+	},
+
+	/**
+	 * Checkbox row.
+	 *
+	 * @param params
+	 * @returns {string}
+	 */
+	checkBoxRow: function(model, attribute, params) {
+		var attributeName = model.getAttributeLabel(attribute),
+			id = model.getName() + '_' + attribute,
+			name = model.getName() + '[' + attribute + ']',
+			value = model.get(attribute, '');
+
+		if (!params) {
+			params = {};
+		}
+
+		return '<div class="form-group">' +
+				'<div class="col-sm-offset-2 col-sm-10">' +
+					'<div class="checkbox">' +
+						'<label><input type="checkbox" name="' + name + '" id="' + id + '"' + (value ? ' checked' : '') +
+						(params.disabled ? ' disabled="disabled"' : '') +
+						'> ' + attributeName + '</label>' +
+					'</div>' +
 				'</div>' +
 			'</div>';
 	},
