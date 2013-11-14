@@ -38,7 +38,7 @@ module.exports = Cube.Class({
 	 */
 	wrap: function(v) {
 		//	XXX: Move wrap!!!
-		return (v + '').trim();//'`' + (v + '').trim() + '`';
+		return '`' + (v + '').trim() + '`';//(v + '').trim();
 	},
 
 	/**

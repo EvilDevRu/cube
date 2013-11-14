@@ -286,11 +286,26 @@ module.exports = Cube.Class({
 	 * Save active record if is it not new.
 	 *
 	 * @param {Function} callback
+	 * @param {Object} context
 	 */
-	save: function(callback) {
+	save: function(callback, context) {
+		/**
+		 * Callback wrapper.
+		 *
+		 * @param {Mixed} err
+		 */
+		var CallbackWrapper = function(err) {
+			if (context) {
+				callback.call(context, err, this);
+				return;
+			}
+
+			callback(err, this);
+		}.bind(this);
+
 		this.beforeSave(function(err) {
 			if (err) {
-				callback(err, this);
+				CallbackWrapper(err);
 				return;
 			}
 
@@ -301,17 +316,17 @@ module.exports = Cube.Class({
 			 */
 			var AfterSaveCallback = function(err) {
 				if (err) {
-					callback(err, this);
+					CallbackWrapper(err);
 					return;
 				}
 
-				callback(null, this);
+				CallbackWrapper();
 			}.bind(this);
 
 			if (this.isNewRecord()) {
 				this.createCommand().insert().one(this.getTableName(), this.getAll(), function(err, data) {
 					if (err) {
-						callback(err, this);
+						CallbackWrapper(err);
 						return;
 					}
 
@@ -330,7 +345,7 @@ module.exports = Cube.Class({
 
 				this.createCommand().update(this.getTableName(), this.getAll(), condition.join(','), params, function(err) {
 					if (err) {
-						callback(err, this);
+						CallbackWrapper(err);
 						return;
 					}
 
