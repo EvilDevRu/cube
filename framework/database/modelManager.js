@@ -141,6 +141,16 @@ module.exports = Cube.Singleton({
 	},
 
 	/**
+	 * Returns ActiveRecord by default driver.
+	 *
+	 * @param name
+	 * @returns {Mixed|Object}
+	 */
+	get: function(name) {
+		return this.getModel(Cube.app.config.database.default, name);
+	},
+
+	/**
 	 * Returns a mysql ActiveRecord.
 	 *
 	 * @param {String} name activeRecord name.
