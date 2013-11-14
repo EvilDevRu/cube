@@ -34,17 +34,24 @@ module.exports = Cube.Class({
 		_.each(Cube.app.config.navbar, function(nav, pull) {
 			result += '<ul class="nav navbar-nav' + (pull !== 'middle' ? ' pull-' + pull : '') + '">';
 			_.each(nav, function(item) {
-				item.name = _.strReplace(item.name, '{{USER_NAME}}', this.middlewares.user.get('name'));
-				item.name = _.strReplace(item.name, '{{SITE_NAME}}', Cube.app.config.siteName);
-				item.url = _.strReplace(item.url, '{{SITE_URL}}', Cube.app.config.siteUrl);
+				item.name = _.strReplace(item.name || '', '{USER_NAME}', this.middlewares.user.get('name'));
+				item.name = _.strReplace(item.name || '', '{SITE_NAME}', Cube.app.config.siteName);
+				item.url = _.strReplace(item.url || '', '{SITE_URL}', Cube.app.config.siteUrl);
 
-				result += '<li' + (item.submenu.length ? ' class="dropdown"' : '') +
-					'><a href="' + (item.submenu.length ? ' class="dropdown-toggle" data-toggle="dropdown"' : '') + (item.url || '#') + '">' + item.name + '</a>';
+				if (item.submenu.length) {
+					result += '<li class="dropdown"><a href="' + (item.url || '#') + '" class="dropdown-toggle" data-toggle="dropdown">' +
+						(item.params.icon ? ' <span class="glyphicon glyphicon-' + item.params.icon + '"></span>&nbsp;&nbsp;' : '') +
+						item.name + ' <span class="caret"></span></a>';
+				} else {
+					result += '<li><a href="' + (item.url || '#') + '">' + item.name + '</a>';
+				}
 
 				if (item.submenu.length) {
 					result += '<ul class="dropdown-menu">';
 					_.each(item.submenu, function(subitem) {
-						result += '<li><a href="' + (subitem.url || '#') + '">' + subitem.name + '</a></li>';
+						result += '<li><a href="' + (subitem.url || '#') + '">' +
+							(subitem.params.icon ? ' <span class="glyphicon glyphicon-' + subitem.params.icon + '"></span>&nbsp;&nbsp;' : '') +
+							subitem.name + '</a></li>';
 					});
 					result += '</ul>';
 				}
