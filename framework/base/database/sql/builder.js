@@ -29,28 +29,30 @@
  * @license http://cubeframework.com/license/
  */
 
+'use strict';
+
 module.exports = Cube.Class({
 	/**
 	 * @constructor
 	 */
 	construct: function() {
-		'use strict';
-
 		var sqlQuery = '',
 			sqlParams = [];
 
 		this.disableBuilder = false;
-		this.private = {
-			defaultParams: {
-				selectParam: 0,		//	0 - OFF, 1 - DISTINCT, 2 - DISTINCTROW, 3 - ALL
-				select: [],
-				from: [],
-				where: [],
-				limit: '',
-				order: ''
-			},
-			buildParams: {}
-		};
+		this.private = _.merge({
+			params: {
+				default: {
+					selectParam: 0,		//	0 - OFF, 1 - DISTINCT, 2 - DISTINCTROW, 3 - ALL
+					select: [],
+					from: [],
+					where: [],
+					limit: '',
+					order: ''
+				},
+				build: {}
+			}
+		}, this.private || {});
 
 		/**
 		 * Specifies the SQL statement to be executed.
@@ -112,7 +114,7 @@ module.exports = Cube.Class({
 		 * @return {CSQLBuilder} this instance.
 		 */
 		this.setBuildParams = function(params) {
-			this.private.buildParams = _.merge(this.private.buildParams, params);
+			this.private.params.build = _.merge(this.private.params.build, params);
 			return this;
 		};
 
@@ -123,10 +125,10 @@ module.exports = Cube.Class({
 		 * @return {CSQLBuilder} this instance.
 		 */
 		this.resetBuildParams = function(params) {
-			params = _.isArray(params) ? params : [ params ];
+			params = _.isArray(params) ? params : [ params ];	//	FIXME: may be bug
 
 			_.each(params, function(param) {
-				this.private.buildParams[ param ] = this.defaultParams[ param ] || null;
+				this.private.params.build[ param ] = this.defaultParams[ param ] || null;
 			}.bind(this));
 
 			return this;
@@ -140,8 +142,6 @@ module.exports = Cube.Class({
 	 * @return {CSQLBuilder} this instance.
 	 */
 	select: function(fields, reset) {
-		'use strict';
-		//	TODO: Table and other to the tilde.
 		if (reset) {
 			this.resetBuildParams(['select']);
 		}
@@ -163,8 +163,7 @@ module.exports = Cube.Class({
 	 * @return {CSQLBuilder} this instance.
 	 */
 	distinct: function() {
-		'use strict';
-		this.private.buildParams.selectParam = 1;
+		this.private.params.build.selectParam = 1;
 		return this;
 	},
 
@@ -174,8 +173,7 @@ module.exports = Cube.Class({
 	 * @return {CSQLBuilder} this instance.
 	 */
 	distinctRow: function() {
-		'use strict';
-		this.private.buildParams.selectParam = 2;
+		this.private.params.build.selectParam = 2;
 		return this;
 	},
 
@@ -185,8 +183,7 @@ module.exports = Cube.Class({
 	 * @return {CSQLBuilder} this instance.
 	 */
 	all: function() {
-		'use strict';
-		this.private.buildParams.selectParam = 3;
+		this.private.params.build.selectParam = 3;
 		return this;
 	},
 
@@ -198,8 +195,6 @@ module.exports = Cube.Class({
 	 * @return {CSQLBuilder} this instance.
 	 */
 	from: function(tables, reset) {
-		'use strict';
-		//	TODO: Table and other to the tilde.
 		if (reset) {
 			this.resetBuildParams('from');
 		}
@@ -231,9 +226,7 @@ module.exports = Cube.Class({
 	 * @return {CSQLBuilder} this instance.
 	 */
 	where: function(condition, params, operator, join) {
-		'use strict';
-		//	TODO: Table and other to the tilde.
-		var where = this.private.buildParams.where || [];
+		var where = this.private.params.build.where || [];
 
 		if (!join) {
 			join = ' AND ';
@@ -259,7 +252,7 @@ module.exports = Cube.Class({
 		}
 
 		this.addParams(params);
-		this.private.buildParams.where = where;
+		this.private.params.build.where = where;
 
 		return this;
 	},
@@ -271,10 +264,7 @@ module.exports = Cube.Class({
 	 * @return {CSQLBuilder} this instance.
 	 */
 	order: function(order) {
-		'use strict';
-		//	TODO: Table and other to the tilde.
-		this.private.buildParams.order = order;
-
+		this.private.params.build.order = order;
 		return this;
 	},
 
@@ -286,13 +276,11 @@ module.exports = Cube.Class({
 	 * @return {CSQLBuilder} this instance.
 	 */
 	limit: function(limit, length) {
-		'use strict';
-
 		if (length) {
 			limit += ', ' + length;
 		}
 
-		this.private.buildParams.limit = limit;
+		this.private.params.build.limit = limit;
 
 		return this;
 	},
@@ -303,13 +291,11 @@ module.exports = Cube.Class({
 	 * @param {Boolean} forceBuild force build query.
 	 */
 	build: function(forceBuild) {
-		'use strict';
-		//	TODO: Table and other to the tilde.
 		if (this.disableBuilder || !!forceBuild || !_.isEmpty(this.getTextQuery())) {
 			return this;
 		}
 
-		var buildParams = _.merge(this.private.defaultParams, this.private.buildParams),
+		var buildParams = _.merge(this.private.params.default, this.private.params.build),
 			query = 'SELECT ';
 
 		switch (buildParams.selectParam) {
@@ -326,7 +312,9 @@ module.exports = Cube.Class({
 				break;
 		}
 
-		query += buildParams.select.join(',') || '*';
+		query += buildParams.select.length ?
+			buildParams.select.join(',') :
+			'*';
 
 		if (buildParams.from.length) {
 			query += ' FROM ' + buildParams.from.join(',');
@@ -355,11 +343,9 @@ module.exports = Cube.Class({
 	 * @return {CSQLBuilder} this instance.
 	 */
 	reset: function() {
-		'use strict';
-
 		this.setTextQuery('', false);
 		this.addParams([], true);
-		this.private.buildParams = {};
+		this.private.params.build = {};
 		this.disableBuilder = false;
 
 		return this;

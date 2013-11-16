@@ -1,5 +1,5 @@
 /**
- * Postgres TableSchema class for for representing the metadata of a database table
+ * MySQL TableSchema class for for representing the metadata of a database table
  * for relational database management systems.
  *
  * @author Dmitriy Yurchenko <feedback@evildev.ru>
@@ -19,7 +19,6 @@ module.exports = Cube.Class({
 	 * @param {Function} callback
 	 */
 	getPks: function(callback) {
-		//	TODO: Тильды
 		Cube.app.mysql.createCommand('SHOW KEYS FROM ' + this.getTableName() + ' WHERE Key_name = "PRIMARY"').query().all(function(err, data) {
 			if (err) {
 				callback(err);

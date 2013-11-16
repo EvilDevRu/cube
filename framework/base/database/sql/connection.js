@@ -7,6 +7,8 @@
  * @license http://cubeframework.com/license/
  */
 
+'use strict';
+
 module.exports = Cube.Class({
 	abstracts: ['connect', 'disconnect', 'createCommand']
 });

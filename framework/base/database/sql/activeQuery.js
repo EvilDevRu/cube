@@ -10,15 +10,11 @@
 'use strict';
 
 module.exports = Cube.Class({
-	extend: Cube.CSQLBuilder,
-
 	/**
 	 * @constructor
 	 * @param {CSQLActiveRecord} activeRecord
 	 */
 	construct: function(activeRecord) {
-		Cube.CSQLBuilder.call(this);
-
 		/**
 		 * @return {CSQLActiveRecord}
 		 */
@@ -40,8 +36,7 @@ module.exports = Cube.Class({
 			}
 
 			if (!_.isEmpty(data)) {
-				this.getActiveRecord().isNewRecord(false);
-				this.getActiveRecord().set(data);
+				this.getActiveRecord().isNewRecord(false).set(data);
 				callback(null, this.getActiveRecord());
 				return;
 			}
@@ -84,7 +79,7 @@ module.exports = Cube.Class({
 		}
 
 		//	TODO: Security
-		this.select('COUNT(' + (q ? q : '*') + ')');
+		this.builder.select('COUNT(' + (q ? q : '*') + ')');
 		this.createCommand().query().scalar(callback);
 	},
 
@@ -103,7 +98,7 @@ module.exports = Cube.Class({
 		}
 
 		//	TODO: Security
-		this.select('SUM(' + q + ')');
+		this.builder.select('SUM(' + q + ')');
 		this.createCommand().query().scalar(callback);
 	},
 
@@ -122,7 +117,7 @@ module.exports = Cube.Class({
 		}
 
 		//	TODO: Security
-		this.select('AVG(' + q + ')');
+		this.builder.select('AVG(' + q + ')');
 		this.createCommand().query().scalar(callback);
 	},
 
@@ -141,7 +136,7 @@ module.exports = Cube.Class({
 		}
 
 		//	TODO: Security
-		this.select('MIN(' + q + ')');
+		this.builder.select('MIN(' + q + ')');
 		this.createCommand().query().scalar(callback);
 	},
 
@@ -160,7 +155,7 @@ module.exports = Cube.Class({
 		}
 
 		//	TODO: Security
-		this.select('MAX(' + q + ')');
+		this.builder.select('MAX(' + q + ')');
 		this.createCommand().query().scalar(callback);
 	},
 
@@ -183,7 +178,7 @@ module.exports = Cube.Class({
 	 * @returns {*}
 	 */
 	orderBy: function(columns) {
-		this.order(columns);
+		this.builder.order(columns);
 		return this;
 	},
 
@@ -191,12 +186,12 @@ module.exports = Cube.Class({
 	 * TODO: JsDoc
 	 */
 	createCommand: function() {
-		if (_.isEmpty(this.private.buildParams.from)) {
-			this.from(this.getActiveRecord().getTableName());
+		if (_.isEmpty(this.builder.private.params.build.from)) {
+			this.builder.from(this.getActiveRecord().getTableName());
 		}
 
-		this.build();
+		this.builder.build();
 
-		return this.getActiveRecord().createCommand(this.getTextQuery(), this.getParams());
+		return this.getActiveRecord().createCommand(this.builder.getTextQuery(), this.builder.getParams());
 	}
 });
