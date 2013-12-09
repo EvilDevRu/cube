@@ -10,7 +10,15 @@
 'use strict';
 
 module.exports = Cube.Class({
-	extend: Cube.CSQLActiveQuery,
+	extend: [ Cube.CSQLActiveQuery ],
+
+	/**
+	 * @constructor
+	 */
+	construct: function(activeRecord) {
+		this.builder = new Cube.MyBuilder();
+		Cube.CSQLActiveQuery.call(this, activeRecord);
+	},
 
 	/**
 	 * Creates a mysql command that can be used to execute this query.
@@ -19,6 +27,6 @@ module.exports = Cube.Class({
 	 */
 	createCommand: function() {
 		Cube.CSQLActiveQuery.functions.createCommand.call(this);
-		return Cube.app.mysql.createCommand(this.getTextQuery(), this.getParams());
+		return Cube.app.mysql.createCommand(this.builder.getTextQuery(), this.builder.getParams());
 	}
 });

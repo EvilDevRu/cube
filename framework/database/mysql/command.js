@@ -10,7 +10,15 @@
 'use strict';
 
 module.exports = Cube.Class({
-	extend: Cube.CSQLCommand,
+	extend: [ Cube.CSQLCommand, Cube.MyBuilder ],
+
+	/**
+	 * @constructor
+	 */
+	construct: function() {
+		Cube.MyBuilder.call(this);
+		Cube.CSQLCommand.apply(this, arguments);
+	},
 
 	/**
 	 * Executes the SQL statement.
@@ -22,7 +30,6 @@ module.exports = Cube.Class({
 		//	Build query @see {CSQLBuilder}.
 		this.build();
 
-		//	TODO: Table and other to the tilde.
 		this.getConnection().query.apply(
 			this.getConnection(),
 			!_.isEmpty(this.getParams()) ?

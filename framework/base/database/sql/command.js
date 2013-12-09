@@ -12,8 +12,6 @@
 'use strict';
 
 module.exports = Cube.Class({
-	extend: Cube.CSQLBuilder,
-
 	/**
 	 * @constructor
 	 * @param {CSQLConnection} connection
@@ -21,24 +19,12 @@ module.exports = Cube.Class({
 	 * @param {Object} params the parameters as pair name-value to be bound to be query.
 	 */
 	construct: function(connection, textQuery, params) {
-		Cube.CSQLBuilder.call(this);
-
 		this.setTextQuery(textQuery);
 		this.addParams(params);
 
 		this.getConnection = function() {
 			return connection;
 		};
-	},
-
-	/**
-	 * Wrap var to tildes.
-	 *
-	 * @param {String|Integer|Float} v variable
-	 */
-	wrap: function(v) {
-		//	XXX: Move wrap!!!
-		return (v + '').trim();//'`' + (v + '').trim() + '`';
 	},
 
 	/**
@@ -58,6 +44,7 @@ module.exports = Cube.Class({
 	 * @return {{one: Function, all: Function}}
 	 */
 	query: function() {
+		console.log(this.getTextQuery());
 		/**
 		 * @param {Integer} type may be `all` or `one` or `scalar`.
 		 * @param {Function} callback
@@ -179,8 +166,9 @@ module.exports = Cube.Class({
 					values.push('$' + (key + 1));
 				});
 
-				//	TODO: Table and other to the tilde.
-				this.setTextQuery('INSERT INTO ' + this.wrap(table) + ' (`' + _.keys(columns).join('`,`') + '`) VALUES (' + values.join(',') + ')')
+				this.setTextQuery('INSERT INTO ' + table + ' (' + this.private.wrapChar +
+						_.keys(columns).join(this.private.wrapChar + ',' + this.private.wrapChar) + this.private.wrapChar +
+						') VALUES (' + values.join(',') + ')')
 					.addParams(params)
 					.execute(_.isFunction(callback) ? callback : function() {});
 
@@ -251,7 +239,7 @@ module.exports = Cube.Class({
 			where = '';
 
 		_.each(columns, function(value, key) {
-			set.push(this.wrap(key) + ' = $' + counter);
+			set.push(key + ' = $' + counter);
 			++counter;
 		}.bind(this));
 
@@ -265,8 +253,7 @@ module.exports = Cube.Class({
 			where = ' WHERE ' + conditions;
 		}
 
-		//	TODO: Table and other to the tilde.
-		this.setTextQuery('UPDATE ' + this.wrap(table) + ' SET ' + set.join(', ') + where)
+		this.setTextQuery('UPDATE ' + table + ' SET ' + set.join(', ') + where)
 			.addParams(_.merge(_.values(columns), params))
 			.execute(_.isFunction(callback) ? callback : function() {});
 
@@ -335,7 +322,7 @@ module.exports = Cube.Class({
 	 */
 	truncate: function(table, callback) {
 		this.disableBuilder = true;
-		this.setTextQuery('TRUNCATE TABLE ' + this.wrap(table))
+		this.setTextQuery('TRUNCATE TABLE ' + table)
 			.execute(_.isFunction(callback) ? callback : function() {});
 
 		//	Reset builder.

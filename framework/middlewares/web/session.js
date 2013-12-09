@@ -14,6 +14,13 @@ module.exports = function(req, res, next) {
 		req.middlewares = {};
 	}
 
+	if (!req.session) {
+		//	TODO: Throw
+		console.warn('Session is off!');
+		res.end();
+		return;
+	}
+
 	req.middlewares.session = new (Cube.Class({
 		/**
 		 * Getter.
@@ -23,7 +30,7 @@ module.exports = function(req, res, next) {
 		 * @return {Mixed}
 		 */
 		get: function(name, defVal) {
-			return !_.isUndefined(req.session[ name ]) ? req.session[ name ] : defVal;
+			return req.session && !_.isUndefined(req.session[ name ]) ? req.session[ name ] : defVal;
 		},
 
 		/**

@@ -43,7 +43,9 @@ module.exports = Cube.Class({
 						(item.params.icon ? ' <span class="glyphicon glyphicon-' + item.params.icon + '"></span>&nbsp;&nbsp;' : '') +
 						item.name + ' <span class="caret"></span></a>';
 				} else {
-					result += '<li><a href="' + (item.url || '#') + '">' + item.name + '</a>';
+					result += '<li><a href="' + (item.url || '#') + '">' +
+						(item.params.icon ? ' <span class="glyphicon glyphicon-' + item.params.icon + '"></span>&nbsp;&nbsp;' : '') +
+						item.name + '</a>';
 				}
 
 				if (item.submenu.length) {
