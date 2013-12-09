@@ -295,7 +295,7 @@ module.exports = Cube.Class({
 
 		if (condition) {
 			query += ' WHERE ';
-			if (_.isObject2(condition)) {
+			if (_.isObject(condition, true)) {
 				var where = [];
 				_.each(condition, function(value, key) {
 					var cond = _.isArray(value) && value.length > 1 ?

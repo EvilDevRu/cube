@@ -26,7 +26,7 @@ module.exports = Cube.Class({
 	 */
 	emit: function(userId) {
 		//	Find client, emit response and remove userId from arguments
-		var client = _.isObject2(userId) ? userId : Cube.app.getClient(userId);
+		var client = _.isObject(userId, true) ? userId : Cube.app.getClient(userId);
 		
 		/**
 		 * FIXME:

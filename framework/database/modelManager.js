@@ -119,7 +119,7 @@ module.exports = Cube.Singleton({
 				}
 
 				var model = stackModels.pop(),
-					name = _.ucFirst(_.baseName(model.file, '.js')),
+					name = _.str.ucFirst(_.fs.baseName(model.file, '.js')),
 					module = require(dirModels + '/' + model.database + '/' + model.file);
 
 				this.setModel(model.database, name, module, function(err) {

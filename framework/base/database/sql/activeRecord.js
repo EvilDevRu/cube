@@ -89,7 +89,7 @@ module.exports = Cube.Class({
 		 * @param {Object} errors a list of errors.
 		 */
 		this.addErrors = function(errors) {
-			if (_.isObject2(errors)) {
+			if (_.isObject(errors, true)) {
 				validateErrors = _.merge(validateErrors, errors);
 			}
 		};
@@ -157,7 +157,7 @@ module.exports = Cube.Class({
 		 * @return {CSQLActiveRecord} this instance.
 		 */
 		this.set = function(name, value) {
-			if (_.isObject2(name)) {
+			if (_.isObject(name, true)) {
 				attributes = _.merge(attributes, name);
 				return this;
 			}
@@ -248,7 +248,7 @@ module.exports = Cube.Class({
 	find: function(condition) {
 		var activeQuery = this.createActiveQuery();
 		if (condition) {
-			if (!_.isObject2(condition)) {
+			if (!_.isObject(condition, true)) {
 				var pks = this.getPrimaryKey();
 				condition = {};
 

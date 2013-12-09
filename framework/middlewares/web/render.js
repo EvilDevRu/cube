@@ -42,7 +42,7 @@ module.exports = function(req, res, next) {
 			 * @return {String} execute result.
 			 */
 			widget: function(name, params) {
-				name = 'C' + _.ucFirst(name) + 'Widget';
+				name = 'C' + _.str.ucFirst(name) + 'Widget';
 				if (!Cube[ name ]) {
 					throw 'Widget ' + name + ' not found!';
 				}
@@ -59,7 +59,7 @@ module.exports = function(req, res, next) {
 			 * @return {Widget}
 			 */
 			createWidget: function(name, params) {
-				name = 'C' + _.ucFirst(name) + 'Widget';
+				name = 'C' + _.str.ucFirst(name) + 'Widget';
 				if (!Cube[ name ]) {
 					throw 'Widget ' + name + ' not found! (createWidget)';
 				}

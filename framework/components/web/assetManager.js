@@ -20,7 +20,7 @@ module.exports = Cube.Singleton({
 		var baseUrl = '/',
 			basePath = Cube.app.basePath + '/assets';
 
-		if (!_.isDir(basePath)) {
+		if (!_.fs.isDir(basePath)) {
 			//	TODO: Throw
 			throw this.basePath + ' path not exist. Make sure assets folder is exist!';
 		}
@@ -88,7 +88,7 @@ module.exports = Cube.Singleton({
 			return this.private.published[ path ];
 		}
 
-		var sourcePath = _.isFile(path) ? _.dirName(path) : path,
+		var sourcePath = _.fs.isFile(path) ? _.fs.dirName(path) : path,
 			assetsDir = this.genPath(path),
 			assetsPath = this.getBasePath() + '/' + assetsDir;
 
@@ -98,7 +98,7 @@ module.exports = Cube.Singleton({
 				throw 'Copying assets';
 			}
 
-			this.private.published[ path ] = this.getBaseUrl() + assetsDir + '/' + _.baseName(path);
+			this.private.published[ path ] = this.getBaseUrl() + assetsDir + '/' + _.fs.baseName(path);
 			return this.private.published[ path ];
 		}
 	},

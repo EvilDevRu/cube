@@ -51,7 +51,7 @@ module.exports = Cube.Singleton({
 			var module = require(this.basePath + '/controllers/' + dftController + '.js'),
 				controller = new module();
 
-			dftAction = 'action' + _.ucFirst(dftAction);
+			dftAction = 'action' + _.str.ucFirst(dftAction);
 			if (!_.isFunction(controller[ dftAction ])) {
 				throw 'Controller action not found!';
 			}

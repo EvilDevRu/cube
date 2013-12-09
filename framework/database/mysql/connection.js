@@ -59,6 +59,7 @@ module.exports = Cube.Class({
 		 * Reconnecting to MySQL server if connection has been lost.
 		 */
 		var hDisconnect = function() {
+			//	TODO: Add to console.log connection params.
 			this.private.connection = this.private.MySQL.createConnection(params);
 			this.private.connection.connect(function(err) {
 				if (err) {

@@ -33,7 +33,7 @@ module.exports = function(req, res, next) {
 		 * @param {Mixed} value
 		 */
 		set: function(name, value) {
-			if (_.isObject2(name)) {
+			if (_.isObject(name, true)) {
 				req.session = _.merge(req.session, name);
 				return;
 			}

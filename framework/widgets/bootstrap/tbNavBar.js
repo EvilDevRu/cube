@@ -34,9 +34,9 @@ module.exports = Cube.Class({
 		_.each(Cube.app.config.navbar, function(nav, pull) {
 			result += '<ul class="nav navbar-nav' + (pull !== 'middle' ? ' pull-' + pull : '') + '">';
 			_.each(nav, function(item) {
-				item.name = _.strReplace(item.name || '', '{USER_NAME}', this.middlewares.user.get('name'));
-				item.name = _.strReplace(item.name || '', '{SITE_NAME}', Cube.app.config.siteName);
-				item.url = _.strReplace(item.url || '', '{SITE_URL}', Cube.app.config.siteUrl);
+				item.name = _.str.replace(item.name || '', '{USER_NAME}', this.middlewares.user.get('name'));
+				item.name = _.str.replace(item.name || '', '{SITE_NAME}', Cube.app.config.siteName);
+				item.url = _.str.replace(item.url || '', '{SITE_URL}', Cube.app.config.siteUrl);
 
 				if (item.submenu.length) {
 					result += '<li class="dropdown"><a href="' + (item.url || '#') + '" class="dropdown-toggle" data-toggle="dropdown">' +

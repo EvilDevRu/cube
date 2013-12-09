@@ -16,7 +16,7 @@ module.exports = Cube.Class({
 	 * Executes the SQL statement.
 	 *
 	 * @param {Function} callback
-	 * @return {PgCommand} this instance.
+	 * @return {MyCommand} this instance.
 	 */
 	execute: function(callback) {
 		//	Build query @see {CSQLBuilder}.

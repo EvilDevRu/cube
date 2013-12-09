@@ -379,7 +379,7 @@ module.exports = Cube.Class({
 		 * @return {RedisActiveRecord} this instance.
 		 */
 		this.set = function(name, value) {
-			if (_.isObject2(name)) {
+			if (_.isObject(name, true)) {
 				attributes = _.merge(attributes, name);
 				return this;
 			}
@@ -698,7 +698,7 @@ module.exports = Cube.Class({
 
 			//	Split attribute items to parts if them too many.
 			if (attribute.length > 100) {
-				parts = _.chunk(this.get(attribute[0]), 100);
+				parts = _.chunks(this.get(attribute[0]), 100);
 			}
 
 			*//**
@@ -851,7 +851,7 @@ module.exports = Cube.Class({
 					callback(null, this);
 				}.bind(this);
 
-				if (_.isObject2(q)) {
+				if (_.isObject(q, true)) {
 					this.private.findRecordIdByAttribute(null, q, qParams, FindCallback);
 					return;
 				}

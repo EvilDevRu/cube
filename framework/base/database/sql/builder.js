@@ -209,7 +209,7 @@ module.exports = Cube.Class({
 			from.push(tables);
 		} else if (_.isArray(tables)) {
 			from = tables;
-		} else if (_.isObject2(tables)) {
+		} else if (_.isObject(tables, true)) {
 			_.each(tables, function(alias, tableName) {
 				from.push(tableName + ' AS ' + alias);
 			});
@@ -239,7 +239,7 @@ module.exports = Cube.Class({
 			join = ' AND ';
 		}
 
-		if (_.isObject2(condition)) {
+		if (_.isObject(condition, true)) {
 			if (!operator) {
 				operator = '=';
 			}

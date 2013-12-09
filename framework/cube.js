@@ -50,7 +50,7 @@ global.Cube = require('./helpers/singleton.js')({
 		 */
 		this.private.init = function(type) {
 			var modules = {},
-				appTypeName = 'C' + _.ucFirst(type) + 'Application';
+				appTypeName = 'C' + _.str.ucFirst(type) + 'Application';
 
 			switch (type) {
 				case that.SOCKET_APP:

@@ -57,9 +57,9 @@ module.exports = Cube.Singleton({
 				_.each(pathes, function(path) {
 					_.each(Cube.fs.readdirSync(path), function(fileName) {
 						var fullName = path + '/' + fileName,
-							comName = 'C' + _.ucFirst(_.baseName(fileName, '.js')) + 'Widget';
+							comName = 'C' + _.str.ucFirst(_.fs.baseName(fileName, '.js')) + 'Widget';
 
-						if (_.isFile(fullName)) {
+						if (_.fs.isFile(fullName)) {
 							Cube[ comName ] = require(fullName);
 						}
 					});

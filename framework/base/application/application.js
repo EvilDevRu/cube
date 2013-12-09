@@ -111,7 +111,7 @@ module.exports = Cube.Class({
 				var files = Cube.fs.readdirSync(that.basePath + '/config');
 				for (var i in files) {
 					if (files.hasOwnProperty(i)) {
-						var env = _.baseName(files[ i ], '.js');
+						var env = _.fs.baseName(files[ i ], '.js');
 						if (process.env.NODE_ENV !== env) {
 							continue;
 						}
@@ -171,7 +171,7 @@ module.exports = Cube.Class({
 						return;
 					}
 
-					var driver = drivers.splice(0, 1);
+					var driver = _.first(drivers.splice(0, 1));
 
 					require(Cube.getPathOfAlias('core.database.' + driver) + '/bootstrap.js')(function(err) {
 						if (err) {
@@ -185,7 +185,7 @@ module.exports = Cube.Class({
 
 				//	Generate database list driver for loading.
 				_.each(config, function(value, key) {
-					if (_.isObject2(config[ key ])) {
+					if (_.isObject(config[ key ], true)) {
 						drivers.push(key);
 					}
 				});
@@ -195,6 +195,7 @@ module.exports = Cube.Class({
 					return;
 				}
 
+				console.log('Databases is loaded');
 				callback();
 			},
 
@@ -232,7 +233,7 @@ module.exports = Cube.Class({
 				var LoadModules = function(path, dir, isUsersModules) {
 					var modules = [];
 
-					if (!_.isDir(path)) {
+					if (!_.fs.isDir(path)) {
 						return modules;
 					}
 
@@ -243,10 +244,10 @@ module.exports = Cube.Class({
 					 * @param fileName
 					 */
 					var LoadOneModule = function(path, fileName) {
-						var name = _.ucFirst(_.baseName(fileName, '.js')),
-							postfix = _.ucFirst(dir).substr(0, dir.length - 1),
+						var name = _.str.ucFirst(_.fs.baseName(fileName, '.js')),
+							postfix = _.str.ucFirst(dir).substr(0, dir.length - 1),
 							moduleName = name + postfix,
-							isEnabled = Cube.app.config.autoload[ dir ][ _.lcFirst(name) ];
+							isEnabled = Cube.app.config.autoload[ dir ][ _.str.lcFirst(name) ];
 
 						//	Check module enable state.
 						if (isEnabled === false) {
@@ -254,7 +255,7 @@ module.exports = Cube.Class({
 						}
 
 						if (isUsersModules) {
-							name = 'My' + _.ucFirst(name);
+							name = 'My' + _.str.ucFirst(name);
 						}
 
 						//	If module is exist, move he as parent.
@@ -271,11 +272,11 @@ module.exports = Cube.Class({
 						if (_.isFunction(Cube[ moduleName ].getInstance)) {
 							switch (postfix) {
 								case 'Component':
-									Cube.app[ _.lcFirst(name) ] = Cube[ moduleName ].getInstance();
+									Cube.app[ _.str.lcFirst(name) ] = Cube[ moduleName ].getInstance();
 									break;
 
 								case 'Util':
-									Cube.utils[ _.lcFirst(name) ] = Cube[ moduleName ].getInstance();
+									Cube.utils[ _.str.lcFirst(name) ] = Cube[ moduleName ].getInstance();
 									break;
 							}
 						}
@@ -284,7 +285,7 @@ module.exports = Cube.Class({
 					//	Load from parent dir.
 					_.each(Cube.fs.readdirSync(path), function(file) {
 						var childPath = path + '/' + file;
-						if (_.isFile(childPath)) {
+						if (_.fs.isFile(childPath)) {
 							LoadOneModule(path, file);	//	Load file.
 							return;
 						}
@@ -303,7 +304,7 @@ module.exports = Cube.Class({
 						appPath = Cube.getPathOfAlias('app.' + dirName),
 						modules = LoadModules(corePath, dirName);
 
-					if (_.isDir(appPath)) {
+					if (_.fs.isDir(appPath)) {
 						modules = _.merge(modules, LoadModules(appPath, dirName, true));
 					}
 
@@ -346,7 +347,7 @@ module.exports = Cube.Class({
 				_.each(fControllers, function(ctlName) {
 					var module = require(ctlPath + ctlName),
 						actNames = _.keys(module.prototype),
-						controller = new module(_.baseName(ctlName, '.js')),
+						controller = new module(_.fs.baseName(ctlName, '.js')),
 						routes = controller.routes(),
 						filters = controller.filters();
 
@@ -356,7 +357,7 @@ module.exports = Cube.Class({
 						}
 
 						var fnsChain = [ controller[ actName ].bind(controller) ],
-							route = _.lcFirst(actName.substr(6));
+							route = _.str.lcFirst(actName.substr(6));
 
 						//	Bind filters (3).
 						_.each(filters, function(filter) {

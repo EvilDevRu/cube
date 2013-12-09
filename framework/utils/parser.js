@@ -37,7 +37,7 @@ module.exports = Cube.Singleton({
 	 */
 	configure: function(options, data) {
 		return {
-			url: _.isObject2(options) ? options.url : options,
+			url: _.isObject(options, true) ? options.url : options,
 			form: data || null
 		};
 	},

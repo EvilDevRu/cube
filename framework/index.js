@@ -6,5 +6,6 @@
  * @copyright Copyright &copy; Dmitriy Yurchenko 2013
  * @license http://cubeframework.com/license/
  */
-require(__dirname + '/helpers/underscore.ex.js');
+
+require(__dirname + '/helpers/underscore/');
 require(__dirname + '/cube.js');
