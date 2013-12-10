@@ -36,7 +36,7 @@ module.exports = Cube.Class({
 			}
 
 			if (!_.isEmpty(data)) {
-				this.getActiveRecord().isNewRecord(false).set(data);
+				this.getActiveRecord().set(data).isNewRecord(false);
 				callback(null, this.getActiveRecord());
 				return;
 			}
