@@ -40,11 +40,11 @@ module.exports = Cube.Class({
 
 				if (item.submenu.length) {
 					result += '<li class="dropdown"><a href="' + (item.url || '#') + '" class="dropdown-toggle" data-toggle="dropdown">' +
-						(item.params.icon ? ' <span class="glyphicon glyphicon-' + item.params.icon + '"></span>&nbsp;&nbsp;' : '') +
+						(item.params.icon ? ' <span class="' + item.params.icon + '"></span>&nbsp;&nbsp;' : '') +
 						item.name + ' <span class="caret"></span></a>';
 				} else {
 					result += '<li><a href="' + (item.url || '#') + '">' +
-						(item.params.icon ? ' <span class="glyphicon glyphicon-' + item.params.icon + '"></span>&nbsp;&nbsp;' : '') +
+						(item.params.icon ? ' <span class="' + item.params.icon + '"></span>&nbsp;&nbsp;' : '') +
 						item.name + '</a>';
 				}
 
@@ -52,7 +52,7 @@ module.exports = Cube.Class({
 					result += '<ul class="dropdown-menu">';
 					_.each(item.submenu, function(subitem) {
 						result += '<li><a href="' + (subitem.url || '#') + '">' +
-							(subitem.params.icon ? ' <span class="glyphicon glyphicon-' + subitem.params.icon + '"></span>&nbsp;&nbsp;' : '') +
+							(subitem.params.icon ? ' <span class="' + subitem.params.icon + '"></span>&nbsp;&nbsp;' : '') +
 							subitem.name + '</a></li>';
 					});
 					result += '</ul>';
