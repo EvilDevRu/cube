@@ -258,7 +258,7 @@ module.exports = Cube.Class({
 				});
 			}
 
-			return activeQuery.where(condition);
+			activeQuery.builder.where(condition);
 		}
 
 		return activeQuery;
