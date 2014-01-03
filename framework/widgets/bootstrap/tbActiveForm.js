@@ -96,7 +96,11 @@ module.exports = Cube.Class({
 		switch (params.type) {
 			case 'ckeditor':
 				editor = '<textarea class="form-control ckeditor" name="' + name + '" id="' + id + '" placeholder="' +
-					(params.placeholder || '') + '">' + Cube.html.entries(model.get(attribute, '')) + '</textarea>';
+					(params.placeholder || '') + '">' + Cube.html.entries(model.get(attribute, '')) + '</textarea><script>' +
+					'CKEDITOR.replace("' + id + '", {' +
+						'language: "' + (params.language || 'en') + '"' +
+					'});' +
+					'</script>';
 				break;
 
 			case 'elrte':
@@ -104,7 +108,7 @@ module.exports = Cube.Class({
 				editor = '<textarea class="form-control" name="' + name + '" placeholder="' +
 					(params.placeholder || '') + '" id="' + id + '">' + Cube.html.entries(model.get(attribute, '')) + '</textarea>' +
 					'<script>$("#' + id + '").elrte({' +
-						'lang: "ru",' +
+						'lang: "' + (params.language || 'en') + '",' +
 						'styleWithCSS : false,' +
 						'height: 400,' +
 						'toolbar: "maxi"' +
