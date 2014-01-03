@@ -44,13 +44,17 @@ module.exports = Cube.Class({
 	 * @return {{one: Function, all: Function}}
 	 */
 	query: function() {
-		console.log(this.getTextQuery());
 		/**
 		 * @param {Integer} type may be `all` or `one` or `scalar`.
 		 * @param {Function} callback
+		 * @param {Object} context
 		 * @return {CSQLCommand} this instance.
 		 */
-		var query = function(type, callback) {
+		var query = function(type, callback, context) {
+			if (!context) {
+				context = this;
+			}
+
 			if (type !== 'all') {
 				this.limit(1);
 			}
@@ -60,7 +64,7 @@ module.exports = Cube.Class({
 
 			var wrapper = function(err, data) {
 				if (err) {
-					callback(err);
+					callback.call(context, err);
 					return;
 				}
 
@@ -69,15 +73,15 @@ module.exports = Cube.Class({
 
 				switch (type) {
 					case 'one':
-						callback(null, data[0] || data);
+						callback.call(context, null, data[0] || data);
 						break;
 
 					case 'all':
-						callback(null, data);
+						callback.call(context, null, data);
 						break;
 
 					case 'scalar':
-						callback(null, _.first(_.values(_.first(data))));
+						callback.call(context, null, _.first(_.values(_.first(data))));
 						break;
 				}
 			};
@@ -100,20 +104,22 @@ module.exports = Cube.Class({
 			 * Executes the SQL statement and send to callback one query result.
 			 *
 			 * @param {Function} callback
+			 * @param {Object} context
 			 * @return {CSQLCommand} this instance.
 			 */
-			one: function(callback) {
-				return query('one', callback);
+			one: function(callback, context) {
+				return query('one', callback, context);
 			},
 
 			/**
 			 * Executes the SQL statement and send to callback all query result.
 			 *
 			 * @param {Function} callback
+			 * @param {Object} context
 			 * @return {CSQLCommand} this instance.
 			 */
-			all: function(callback) {
-				return query('all', callback);
+			all: function(callback, context) {
+				return query('all', callback, context);
 			},
 
 			/**
@@ -121,10 +127,11 @@ module.exports = Cube.Class({
 			 * column in the first row of data.
 			 *
 			 * @param {Function} callback
+			 * @param {Object} context
 			 * @return {CSQLCommand} this instance.
 			 */
-			scalar: function(callback) {
-				return query('scalar', callback);
+			scalar: function(callback, context) {
+				return query('scalar', callback, context);
 			}
 		};
 	},

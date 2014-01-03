@@ -27,8 +27,13 @@ module.exports = Cube.Class({
 	 * Executes query and provides a single row of result.
 	 *
 	 * @param {Function} callback function has two arguments: errors and CSQLActiveRecord.
+	 * @param {Object} context
 	 */
-	one: function(callback) {
+	one: function(callback, context) {
+		if (!context) {
+			context = this;
+		}
+
 		this.createCommand().query().one(function(err, data) {
 			if (err) {
 				callback(err);
@@ -37,13 +42,13 @@ module.exports = Cube.Class({
 
 			if (!_.isEmpty(data)) {
 				this.getActiveRecord().set(data).isNewRecord(false);
-				callback(null, this.getActiveRecord());
+				callback.call(context, null, this.getActiveRecord());
 				return;
 			}
 
 			//	TODO: Throw (need message);
-			callback('Item not found');
-		}.bind(this));
+			callback.call(context, 'Item not found');
+		}, this);
 	},
 
 	/**
@@ -51,8 +56,8 @@ module.exports = Cube.Class({
 	 *
 	 * @param {Function} callback function has two arguments: errors and query results.
 	 */
-	all: function(callback) {
-		this.createCommand().query().all(callback);
+	all: function(callback, context) {
+		this.createCommand().query().all(callback, context);
 	},
 
 	/**

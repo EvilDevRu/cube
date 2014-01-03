@@ -25,6 +25,13 @@ module.exports = function(req, res, next) {
 		},
 
 		/**
+		 * @return {Integer} user identity.
+		 */
+		getId: function() {
+			return req.middlewares.session.get('userId');
+		},
+
+		/**
 		 * Getter params.
 		 *
 		 * @param {String} name

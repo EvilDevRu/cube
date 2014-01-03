@@ -19,24 +19,29 @@ var RequestMiddleware = Cube.Class({
 	},
 
 	/**
-	 * Returns the named post parameter value.
-	 * If the POST parameter does not exist, the second parameter to this method will be returned.
-	 *
-	 * @param {String} name
-	 * @param {Mixed} defVal
-	 * @param {String} name the post parameter name.
+	 * @return {Object} getters for post values.
 	 */
-	get: function(name, defVal) {
-		return !_.isUndefined(this.req.body[ name ]) ? this.req.body[ name ] : defVal;
-	},
+	getPost: function() {
+		return {
+			/**
+			 * Returns the named post parameter value.
+			 * If the POST parameter does not exist, the second parameter to this method will be returned.
+			 *
+			 * @param {String} name
+			 * @param {Mixed} defVal
+			 * @param {String} name the post parameter name.
+			 */
+			one: function(name, defVal) {
+				return !_.isUndefined(this.req.body[ name ]) ? this.req.body[ name ] : defVal;
+			}.bind(this),
 
-	/**
-	 * Returns all post values.
-	 *
-	 * @return {Object}
-	 */
-	getAll: function() {
-		return this.req.body || {};
+			/**
+			 * @return {Object} all post values.
+			 */
+			all: function() {
+				return this.req.body || {};
+			}.bind(this)
+		};
 	},
 
 	/**
@@ -100,6 +105,7 @@ var RequestMiddleware = Cube.Class({
 	 */
 	end: function() {
 		this.res.end();
+		return this;
 	},
 
 	/**
@@ -107,17 +113,15 @@ var RequestMiddleware = Cube.Class({
 	 *
 	 * @param {Integer} status
 	 * @param {Mixed} data
-	 * @param {Boolean} isEnd true if end request
+	 * @return {RequestMiddleware} this instance.
 	 */
-	send: function(status, data, isEnd) {
+	send: function(status, data) {
 		this.res.write(JSON.stringify({
 			status: status,
 			data: data
 		}));
 
-		if (isEnd) {
-			this.res.end();
-		}
+		return this;
 	},
 
 	/**

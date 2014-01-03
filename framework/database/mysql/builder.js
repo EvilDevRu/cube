@@ -12,5 +12,15 @@
 'use strict';
 
 module.exports = Cube.Class({
-	extend: Cube.CSQLBuilder
+	extend: Cube.CSQLBuilder,
+
+	/**
+	 * @constructor
+	 */
+	construct: function() {
+		Cube.CSQLBuilder.call(this);
+
+		//	Wrap char.
+		this.private.wrapChar = '`';
+	}
 });
