@@ -71,17 +71,29 @@ module.exports = Cube.Class({
 			return this.getTableSchema().getPrimaryKey();
 		};
 
-		/**
-		 * Returns a value indicating whether there is any validation error.
-		 *
-		 * @param {String} attribute attribute name. Use null to check all attributes.
-		 * @return {Mixed} errors for all attributes or the specified attribute.
-		 *     Use string for the specified attribute of array for all.
-		 *     Empty object is returned if no error.
-		 */
-		this.getErrors = function(attribute) {
-			return (attribute ? validateErrors[ attribute ] : validateErrors) || {};
-		};
+        /**
+         * Returns a value indicating whether there is any validation error.
+         *
+         * @param {String} attribute attribute name. Use null to check all attributes.
+         * @return {Mixed} errors for all attributes or the specified attribute.
+         *     Use string for the specified attribute of array for all.
+         *     Empty object is returned if no error.
+         */
+        this.getErrors = function(attribute) {
+            return (attribute ? validateErrors[ attribute ] : validateErrors) || {};
+        };
+
+        /**
+         * Returns a value indicating whether there is any validation error.
+         *
+         * @param {String} attribute attribute name. Use null to check all attributes.
+         * @return {Mixed} errors for all attributes or the specified attribute.
+         *     Use string for the specified attribute of array for all.
+         *     Empty object is returned if no error.
+         */
+        this.hasErrors = function() {
+            return _.size(validateErrors);
+        };
 
 		/**
 		 * Add errors to list of errors.
