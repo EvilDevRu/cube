@@ -295,6 +295,24 @@ module.exports = Cube.Class({
 	},
 
 	/**
+	 * Executes before find active record.
+	 *
+	 * @param {Function} callback
+	 */
+	beforeFind: function(callback) {
+		callback();
+	},
+
+	/**
+	 * Executes after find active record.
+	 *
+	 * @param {Function} callback
+	 */
+	afterFind: function(callback) {
+		callback();
+	},
+
+	/**
 	 * Save active record if is it not new.
 	 *
 	 * @param {Function} callback

@@ -34,21 +34,28 @@ module.exports = Cube.Class({
 			context = this;
 		}
 
-		this.createCommand().query().one(function(err, data) {
-			if (err) {
-				callback(err);
-				return;
-			}
+		this.getActiveRecord().beforeFind(function() {
+			this.createCommand().query().one(function(err, data) {
+				if (err) {
+					callback(err);
+					return;
+				}
 
-			if (!_.isEmpty(data)) {
-				this.getActiveRecord().set(data).isNewRecord(false);
-				callback.call(context, null, this.getActiveRecord());
-				return;
-			}
+				if (!_.isEmpty(data)) {
+					this.getActiveRecord().set(data).isNewRecord(false);
+					this.getActiveRecord().afterFind(function() {
+						callback.call(context, null, this.getActiveRecord());
+					}.bind(this));
 
-			//	TODO: Throw (need message);
-			callback.call(context, 'Item not found');
-		}, this);
+					return;
+				}
+
+				//	TODO: Throw (need message);
+				this.getActiveRecord().afterFind(function() {
+					callback.call(context, 'Item not found');
+				});
+			}, this);
+		}.bind(this));
 	},
 
 	/**
