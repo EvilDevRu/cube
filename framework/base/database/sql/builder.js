@@ -1,23 +1,23 @@
 /**
  * Builder of query base class for relational database management systems.
  *
- * For example:
- *     var sql = builder
- *         .select('*')
- *         .select(['asd', 'dsa'])
- *         .select(['aaa'])
- *         .distinct()
- *         .all()
- *         .from('table1')
- *         .from(['table3', 'table4'])
- *         .from({ table5: 't5' })
- *         .where('z=4')
- *         .where('z=$1', { $1: 23 }, null, ' OR ')
- *         .where('z=$2', { $2: 32 }, null, ' OR ')
- *         .limit(1, 1)
- *         .order('z DESC')
- *         .build()
- *         .getTextQuery();
+ * @example
+ * var sql = builder
+ *     .select('*')
+ *     .select(['asd', 'dsa'])
+ *     .select(['aaa'])
+ *     .distinct()
+ *     .all()
+ *     .from('table1')
+ *     .from(['table3', 'table4'])
+ *     .from({ table5: 't5' })
+ *     .where('z=4')
+ *     .where('z=$1', { $1: 23 }, null, ' OR ')
+ *     .where('z=$2', { $2: 32 }, null, ' OR ')
+ *     .limit(1, 1)
+ *     .order('z DESC')
+ *     .build()
+ *     .getTextQuery();
  *
  * Result: SELECT ALL *,asd,dsa,aaa FROM table1,table3,table4,table5 AS t5 WHERE z=4 OR z=$1 OR z=$2 ORDER BY z DESC LIMIT 1, 1
  *
@@ -81,8 +81,8 @@ module.exports = Cube.Class({
 
 		/**
 		 * Adds additional parameters to be bound to the query.
-		 * For example:
-		 *  .addParams({ $1: 'Jack', $2: 'Captain' });
+		 * @example
+		 * .addParams({ $1: 'Jack', $2: 'Captain' });
 		 *
 		 * @param {Object} params list of query parameter values indexed by parameter placeholders.
 		 * @param {Boolean} reset replace parameters if true (default by false).

@@ -336,5 +336,127 @@ module.exports = Cube.Class({
 		this.reset();
 
 		return this;
+	},
+
+	/**
+	 * All for work with tables.
+	 *
+	 * @param {String} table table name.
+	 */
+	table: function(table) {
+		table = this.private.wrapChar + table + this.private.wrapChar;
+
+		return {
+			/**
+			 * Create new table.
+			 * @example
+			 * Cube.app.db.createCommand().table('tmp_table').create({
+			 *		id: 'pk',
+			 *		alias: 'VARCHAR(128)'
+			 *	}, 'ENGINE=InnoDB', function(err) {
+			 *		//
+			 *	});
+			 *
+			 * @param {Object} columns
+			 * @param {String} options
+			 * @param {Function} callback
+			 */
+			create: function(columns, options, callback) {
+				var body = [];
+
+				if (!_.isString(options)) {
+					options = '';
+				}
+
+				if (!options) {
+					options = 'ENGINE=InnoDB';
+				}
+
+				_.each(columns, function(type, name) {
+					switch (type.trim()) {
+						case 'pk':
+							type = 'INT NOT NULL AUTO_INCREMENT PRIMARY KEY';
+							break;
+					}
+
+					//	TODO: Add regexp for validate columns.
+					body.push(name + ' ' + type);
+				});
+
+				if (body.length === 0) {
+					//	TODO: throw
+					callback('No columns during create table');
+					return;
+				}
+
+				this.disableBuilder = true;
+				return this.setTextQuery('CREATE TABLE ' + table + ' (' + body.join(',') + ') ' + options)
+					.execute(_.isFunction(callback) ? callback : function() {})
+					.reset();
+			}.bind(this),
+
+			/**
+			 * Drop table.
+			 * @example
+			 * Cube.app.db.createCommand().table('tmp_table').drop(function(err) {
+			 *		//
+			 *	});
+			 *
+			 * @param {Function} callback
+			 */
+			drop: function(callback) {
+				this.disableBuilder = true;
+				return this.setTextQuery('DROP TABLE ' + table)
+					.execute(_.isFunction(callback) ? callback : function() {})
+					.reset();
+			}.bind(this),
+
+			/**
+			 * Rename table.
+			 * @example
+			 * Cube.app.db.createCommand().table('tmp_table').rename('new_name', function(err) {
+			 *		//
+			 *	});
+			 *
+			 * @param {String} name new name of table.
+			 * @param {Function} callback
+			 */
+			rename: function(newName, callback) {
+				this.disableBuilder = true;
+				return this.setTextQuery('RENAME TABLE ' + table + ' TO ' + newName)
+					.execute(_.isFunction(callback) ? callback : function() {})
+					.reset();
+			}.bind(this)
+		}
+	},
+
+	/**
+	 * All for work with columns of table.
+	 *
+	 * @param table
+	 */
+	columns: function(table) {
+		return {
+			/**
+			 * Add new column.
+			 *
+			 * @param column
+			 * @param type
+			 * @param {Function} callback
+			 */
+			add: function(column, type) {
+				//
+			}.bind(this),
+
+			/**
+			 * Drop column.
+			 *
+			 * @param column
+			 * @param {Function} callback
+			 */
+			drop: function(column) {
+				//
+			}.bind(this)
+		}
 	}
 });
