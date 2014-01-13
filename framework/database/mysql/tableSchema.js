@@ -14,11 +14,11 @@ module.exports = Cube.Class({
 	extend: Cube.CSQLTableSchema,
 
 	/**
-	 * Send all private keys to callback.
+	 * Init primary keys.
 	 *
 	 * @param {Function} callback
 	 */
-	getPks: function(callback) {
+	initPrimaryKeys: function(callback) {
 		Cube.app.mysql.createCommand('SHOW KEYS FROM ' + this.getTableName() + ' WHERE Key_name = "PRIMARY"').query().all(function(err, data) {
 			if (err) {
 				callback(err);
@@ -31,6 +31,26 @@ module.exports = Cube.Class({
 				this.addPrimaryKeyColumn(pk.Column_name);
 				/* jshint camelcase: true */
 			}.bind(this));
+
+			callback();
+		}.bind(this));
+	},
+
+	/**
+	 * Init structure of table.
+	 *
+	 * @param callback
+	 */
+	initTableStructure: function(callback) {
+		Cube.app.mysql.createCommand('DESCRIBE ' + this.getTableName()).query().all(function(err, data) {
+			if (err) {
+				callback(err);
+				return;
+			}
+
+			_.each(data, function(info) {
+				this.addStructureColumn(info.Field, _.omit(info, 'Field'));
+			}, this);
 
 			callback();
 		}.bind(this));

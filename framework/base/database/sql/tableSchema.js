@@ -11,8 +11,6 @@
 'use strict';
 
 module.exports = Cube.Class({
-	abstracts: ['getPks'],
-
 	/**
 	 * @constructor
 	 * @param {String} table
@@ -22,6 +20,7 @@ module.exports = Cube.Class({
 		var curDb = Cube.app.config.database.default,
 			curDbConfig = Cube.app.config.database[ curDb ],
 			primaryKey = [],
+			structure = [],
 			regExpTable = new RegExp('{{(.+)}}', 'i').exec(table),
 			tableName = regExpTable ?
 				(curDbConfig.prefix || '') + regExpTable[1] :
@@ -49,6 +48,23 @@ module.exports = Cube.Class({
 		};
 
 		/**
+		 * Add column info.
+		 */
+		this.addStructureColumn = function(column, info) {
+			structure[ column ] = info;
+		};
+
+		/**
+		 * Returns table structure.
+		 *
+		 * @param {String} column name of column.
+		 * @return {Object}
+		 */
+		this.getStructure = function(column) {
+			return column ? structure[ column ] : structure;
+		};
+
+		/**
 		 * @return {String} name of table.
 		 */
 		this.getTableName = function() {
@@ -56,13 +72,29 @@ module.exports = Cube.Class({
 		};
 
 		//	Init.
-		this.getPks(function(err) {
-			if (err) {
-				callback(err);
-				return;
-			}
+		Cube.async.waterfall([
+			this.initPrimaryKeys.bind(this),
+			this.initTableStructure.bind(this)
+		], function(err) {
+			callback(err, this);
+		}.bind(this));
+	},
 
-			callback();
-		});
+	/**
+	 * Init primary key of table.
+	 *
+	 * @param callback
+	 */
+	initPrimaryKeys: function(callback) {
+		callback();
+	},
+
+	/**
+	 * Init structure of table.
+	 *
+	 * @param callback
+	 */
+	initTableStructure: function(callback) {
+		callback();
 	}
 });
