@@ -20,7 +20,7 @@ module.exports = Cube.Class({
 		var curDb = Cube.app.config.database.default,
 			curDbConfig = Cube.app.config.database[ curDb ],
 			primaryKey = [],
-			structure = [],
+			structure = {},
 			regExpTable = new RegExp('{{(.+)}}', 'i').exec(table),
 			tableName = regExpTable ?
 				(curDbConfig.prefix || '') + regExpTable[1] :
