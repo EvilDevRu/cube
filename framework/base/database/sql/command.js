@@ -400,7 +400,7 @@ module.exports = Cube.Class({
 			 * @example
 			 * Cube.app.db.createCommand().table('tmp_table').drop(function(err) {
 			 *		//
-			 *	});
+			 * });
 			 *
 			 * @param {Function} callback
 			 */
@@ -427,35 +427,64 @@ module.exports = Cube.Class({
 					.execute(_.isFunction(callback) ? callback : function() {})
 					.reset();
 			}.bind(this)
-		}
+		};
 	},
 
 	/**
 	 * All for work with columns of table.
 	 *
-	 * @param table
+	 * @param {String} table
+	 * @param {String} column
 	 */
-	columns: function(table) {
+	column: function(table, column) {
+		table = this.private.wrapChar + table + this.private.wrapChar;
+		column = this.private.wrapChar + column + this.private.wrapChar;
+
 		return {
 			/**
 			 * Add new column.
+			 * @example
+			 * Cube.app.db.createCommand().column('table_name', 'column_name').add('VARCHAR(60)', '', function(err) { ...
 			 *
-			 * @param column
-			 * @param type
+			 * @param {String} type
 			 * @param {Function} callback
 			 */
-			add: function(column, type) {
-				//
+			add: function(type, after, callback) {
+				after = after ? ' AFTER ' + this.private.wrapChar + after + this.private.wrapChar : '';
+				this.disableBuilder = true;
+				return this.setTextQuery('ALTER TABLE ' + table + ' ADD ' + column + ' ' + type + after)
+					.execute(_.isFunction(callback) ? callback : function() {})
+					.reset();
+			}.bind(this),
+
+			/**
+			 * Rename column.
+			 * @example
+			 * Cube.app.db.createCommand().column('table_name', 'column_name').rename('new_col_name', 'VARCHAR(60)', function(err) { ...
+			 *
+			 * @param {String} newName
+			 * @param {String} type
+			 * @param {Function} callback
+			 */
+			rename: function(newName, type, callback) {
+				this.disableBuilder = true;
+				return this.setTextQuery('ALTER TABLE ' + table + ' CHANGE ' + column + ' ' + newName + ' ' + type)
+					.execute(_.isFunction(callback) ? callback : function() {})
+					.reset();
 			}.bind(this),
 
 			/**
 			 * Drop column.
+			 * @example
+			 * Cube.app.db.createCommand().column('table_name', 'column_name').drop(function(err) { ...
 			 *
-			 * @param column
 			 * @param {Function} callback
 			 */
-			drop: function(column) {
-				//
+			drop: function(callback) {
+				this.disableBuilder = true;
+				return this.setTextQuery('ALTER TABLE ' + table + ' DROP ' + column)
+					.execute(_.isFunction(callback) ? callback : function() {})
+					.reset();
 			}.bind(this)
 		}
 	}
