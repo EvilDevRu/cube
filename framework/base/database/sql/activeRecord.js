@@ -325,6 +325,9 @@ module.exports = Cube.Class({
 		 * @param {Mixed} err
 		 */
 		var CallbackWrapper = function(err) {
+			//	After afterSave method of model record is not new.
+			this.isNewRecord(false);
+
 			if (context) {
 				callback.call(context, err, this);
 				return;
@@ -361,7 +364,6 @@ module.exports = Cube.Class({
 					}
 
 					this.savePks2Attr(data);
-					this.isNewRecord(false);
 					this.afterSave(AfterSaveCallback);
 				}.bind(this));
 			} else {
