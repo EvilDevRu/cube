@@ -188,5 +188,41 @@ module.exports = Cube.Singleton({
 	 */
 	redis: function(name) {
 		return this.getModel('redis', name);
+	},
+
+	/**
+	 * Create temprary model by name of table.
+	 *
+	 * @param {String} name name of object\table.
+	 * @return {Function}
+	 */
+	create: function(name) {
+		/**
+		 * Create model.
+		 *
+		 * @param driver
+		 * @constructor
+		 */
+		var GenModel = function(parent, data) {
+			return Cube.Class(_.merge({
+				extend: parent,
+
+				/**
+				 * Returns without formatted table name.
+				 *
+				 * @return {String} table name.
+				 */
+				tableName: function() {
+					return name;
+				}
+			}, data));
+		};
+
+		//	TODO: Other drivers.
+		return {
+			mysql: function(data) {
+				return new GenModel(Cube.MyActiveRecord, data);
+			}
+		};
 	}
 });
