@@ -25,19 +25,13 @@ module.exports = Cube.Singleton({
 		 * @return {Mixed} model if is exists.
 		 */
 		this.getModel = function(database, name) {
-			try {
-				//	TODO: Throw.
-				if (!activeRecords[ database ] || !activeRecords[ database ][ name ]) {
-					throw database + ' ' + name + ' model not found!';
-				}
+			//	TODO: Throw.
+			if (!activeRecords[ database ] || !activeRecords[ database ][ name ]) {
+				//console.error(database + ' ' + name + ' model not found!');
+				return;
+			}
 
-				return new activeRecords[ database ][ name ].model(name, activeRecords[ database ][ name ].TableSchema);
-			}
-			catch (e) {
-				//	TODO: Throw.
-				console.error(e);
-				Cube.app.end(1);
-			}
+			return new activeRecords[ database ][ name ].model(name, activeRecords[ database ][ name ].TableSchema);
 		};
 
 		/**
@@ -201,11 +195,11 @@ module.exports = Cube.Singleton({
 		 * Create model.
 		 *
 		 * @param driver
-		 * @constructor
+		 * @return {ActiveRecord}
 		 */
-		var GenModel = function(parent, data) {
-			return Cube.Class(_.merge({
-				extend: parent,
+		var Model = function(arParent, modelData) {
+			return Cube.Class(_.merge(modelData || {}, {
+				extend: arParent,
 
 				/**
 				 * Returns without formatted table name.
@@ -215,13 +209,39 @@ module.exports = Cube.Singleton({
 				tableName: function() {
 					return name;
 				}
-			}, data));
+			}));
 		};
+
+		/**
+		 * Set and get model.
+		 *
+		 * @type {function(this:exports)}
+		 */
+		var GetSet = function(database, activeRecord, modelData, callback, context) {
+			if (!context) {
+				context = this;
+			}
+
+			var model = this.getModel(database, name);
+			if (model) {
+				callback.call(context, null, model);
+				return;
+			}
+
+			this.setModel(database, name, Model(activeRecord, modelData), function(err) {
+				if (err) {
+					callback.call(context, err);
+					return;
+				}
+
+				callback.call(context, null, this.getModel(database, name));
+			}.bind(this));
+		}.bind(this);
 
 		//	TODO: Other drivers.
 		return {
-			mysql: function(data) {
-				return new GenModel(Cube.MyActiveRecord, data);
+			mysql: function(modelData, callback, context) {
+				GetSet('mysql', Cube.MyActiveRecord, modelData, callback, context);
 			}
 		};
 	}
