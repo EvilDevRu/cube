@@ -51,10 +51,6 @@ module.exports = Cube.Class({
 		 * @return {CSQLCommand} this instance.
 		 */
 		var query = function(type, callback, context) {
-			if (!context) {
-				context = this;
-			}
-
 			if (type !== 'all') {
 				this.limit(1);
 			}
@@ -157,15 +153,16 @@ module.exports = Cube.Class({
 			 * @param {String} table table name.
 			 * @param {Object} columns columns data as pair name-value of column.
 			 * @param {Function} callback
+			 * @param {Object} context
 			 * @return {CSQLCommand} this instance.
 			 */
-			one: function(table, columns, callback) {
+			one: function(table, columns, callback, context) {
 				var params = _.values(columns),
 					values = [];
 
 				if (_.isUndefined(columns)) {
 					//	TODO: Throw
-					callback('Columns is empty!');
+					callback.call(context, 'Columns is empty!');
 					return;
 				}
 
@@ -177,7 +174,7 @@ module.exports = Cube.Class({
 						_.keys(columns).join(this.private.wrapChar + ',' + this.private.wrapChar) + this.private.wrapChar +
 						') VALUES (' + values.join(',') + ')')
 					.addParams(params)
-					.execute(_.isFunction(callback) ? callback : function() {});
+					.execute(_.isFunction(callback) ? callback.bind(context) : function() {});
 
 				//	Reset builder.
 				this.reset();
@@ -192,9 +189,10 @@ module.exports = Cube.Class({
 			 * @param {Array} columns columns data as array of names columns.
 			 * @param {Array} data data for inserting as array columns of pairs name-value.
 			 * @param {Function} callback
+			 * @param {Object} context
 			 * @return {CSQLCommand} this instance.
 			 */
-			all: function(table, columns, data, callback) {
+			all: function(table, columns, data, callback, context) {
 				var values = [],
 					counter = 1;
 
@@ -216,7 +214,7 @@ module.exports = Cube.Class({
 				//	TODO: Table and other to the tilde.
 				this.setTextQuery('INSERT INTO ' + table + ' (' + columns.join(',') + ') VALUES ' + values.join(','))
 					.addParams(_.flatten(data))
-					.execute(_.isFunction(callback) ? callback : function() {});
+					.execute(_.isFunction(callback) ? callback.bind(context) : function() {});
 
 				//	Reset builder.
 				this.reset();
@@ -238,9 +236,10 @@ module.exports = Cube.Class({
 	 * @param {String} conditions the conditions that will be put in the WHERE part.
 	 * @param {Object} params the data to be bound to the query. Do not use column names as parameter names here.
 	 * @param {Function} callback
+	 * @param {Object} context
 	 * @return {CSQLCommand} this instance.
 	 */
-	update: function(table, columns, conditions, params, callback) {
+	update: function(table, columns, conditions, params, callback, context) {
 		var set = [],
 			counter = 1,
 			where = '';
@@ -262,7 +261,7 @@ module.exports = Cube.Class({
 
 		this.setTextQuery('UPDATE ' + table + ' SET ' + set.join(', ') + where)
 			.addParams(_.merge(_.values(columns), params))
-			.execute(_.isFunction(callback) ? callback : function() {});
+			.execute(_.isFunction(callback) ? callback.bind(context) : function() {});
 
 		//	Reset builder.
 		this.reset();
@@ -282,8 +281,11 @@ module.exports = Cube.Class({
 	 * @param {String} table the table where the data will be deleted from.
 	 * @param {Mixed} condition the conditions that will be put in the WHERE part of the DELETE SQL.
 	 *     It may be string or object type of argument as pairs column-value.
+	 * @param {Array|Function} params may be params or callback function.
+	 * @param {Function} callback
+	 * @param {Object} context
 	 */
-	delete: function(table, condition, params, callback) {
+	delete: function(table, condition, params, callback, context) {
 		//	TODO: Table and other to the tilde.
 		var query = 'DELETE FROM ' + table;
 
@@ -313,7 +315,7 @@ module.exports = Cube.Class({
 		}
 
 		this.setTextQuery(query)
-			.execute(_.isFunction(callback) ? callback : function() {});
+			.execute(_.isFunction(callback) ? callback.bind(context) : function() {});
 
 		//	Reset builder.
 		this.reset();
@@ -326,11 +328,12 @@ module.exports = Cube.Class({
 	 *
 	 * @param {String} table the table to be truncated.
 	 * @param {Function} callback
+	 * @param {Object} context
 	 */
-	truncate: function(table, callback) {
+	truncate: function(table, callback, context) {
 		this.disableBuilder = true;
 		this.setTextQuery('TRUNCATE TABLE ' + table)
-			.execute(_.isFunction(callback) ? callback : function() {});
+			.execute(_.isFunction(callback) ? callback.bind(context) : function() {});
 
 		//	Reset builder.
 		this.reset();
@@ -360,8 +363,9 @@ module.exports = Cube.Class({
 			 * @param {Object} columns
 			 * @param {String} options
 			 * @param {Function} callback
+			 * @param {Object} context
 			 */
-			create: function(columns, options, callback) {
+			create: function(columns, options, callback, context) {
 				var body = [];
 
 				if (!_.isString(options)) {
@@ -385,13 +389,13 @@ module.exports = Cube.Class({
 
 				if (body.length === 0) {
 					//	TODO: throw
-					callback('No columns during create table');
+					callback.call(context, 'No columns during create table');
 					return;
 				}
 
 				this.disableBuilder = true;
 				return this.setTextQuery('CREATE TABLE ' + table + ' (' + body.join(',') + ') ' + options)
-					.execute(_.isFunction(callback) ? callback : function() {})
+					.execute(_.isFunction(callback) ? callback.bind(context) : function() {})
 					.reset();
 			}.bind(this),
 
@@ -403,11 +407,12 @@ module.exports = Cube.Class({
 			 * });
 			 *
 			 * @param {Function} callback
+			 * @param {Object} context
 			 */
-			drop: function(callback) {
+			drop: function(callback, context) {
 				this.disableBuilder = true;
 				return this.setTextQuery('DROP TABLE ' + table)
-					.execute(_.isFunction(callback) ? callback : function() {})
+					.execute(_.isFunction(callback) ? callback.bind(context) : function() {})
 					.reset();
 			}.bind(this),
 
@@ -420,11 +425,12 @@ module.exports = Cube.Class({
 			 *
 			 * @param {String} name new name of table.
 			 * @param {Function} callback
+			 * @param {Object} context
 			 */
-			rename: function(newName, callback) {
+			rename: function(newName, callback, context) {
 				this.disableBuilder = true;
 				return this.setTextQuery('RENAME TABLE ' + table + ' TO ' + newName)
-					.execute(_.isFunction(callback) ? callback : function() {})
+					.execute(_.isFunction(callback) ? callback.bind(context) : function() {})
 					.reset();
 			}.bind(this)
 		};
@@ -448,12 +454,13 @@ module.exports = Cube.Class({
 			 *
 			 * @param {String} type
 			 * @param {Function} callback
+			 * @param {Object} context
 			 */
-			add: function(type, after, callback) {
+			add: function(type, after, callback, context) {
 				after = after ? ' AFTER ' + this.private.wrapChar + after + this.private.wrapChar : '';
 				this.disableBuilder = true;
 				return this.setTextQuery('ALTER TABLE ' + table + ' ADD ' + column + ' ' + type + after)
-					.execute(_.isFunction(callback) ? callback : function() {})
+					.execute(_.isFunction(callback) ? callback.bind(context) : function() {})
 					.reset();
 			}.bind(this),
 
@@ -465,11 +472,12 @@ module.exports = Cube.Class({
 			 * @param {String} newName
 			 * @param {String} type
 			 * @param {Function} callback
+			 * @param {Object} context
 			 */
-			rename: function(newName, type, callback) {
+			rename: function(newName, type, callback, context) {
 				this.disableBuilder = true;
 				return this.setTextQuery('ALTER TABLE ' + table + ' CHANGE ' + column + ' ' + newName + ' ' + type)
-					.execute(_.isFunction(callback) ? callback : function() {})
+					.execute(_.isFunction(callback) ? callback.bind(context) : function() {})
 					.reset();
 			}.bind(this),
 
@@ -479,11 +487,12 @@ module.exports = Cube.Class({
 			 * Cube.app.db.createCommand().column('table_name', 'column_name').drop(function(err) { ...
 			 *
 			 * @param {Function} callback
+			 * @param {Object} context
 			 */
-			drop: function(callback) {
+			drop: function(callback, context) {
 				this.disableBuilder = true;
 				return this.setTextQuery('ALTER TABLE ' + table + ' DROP ' + column)
-					.execute(_.isFunction(callback) ? callback : function() {})
+					.execute(_.isFunction(callback) ? callback.bind(context) : function() {})
 					.reset();
 			}.bind(this)
 		}

@@ -30,14 +30,10 @@ module.exports = Cube.Class({
 	 * @param {Object} context
 	 */
 	one: function(callback, context) {
-		if (!context) {
-			context = this;
-		}
-
 		this.getActiveRecord().beforeFind(function() {
 			this.createCommand().query().one(function(err, data) {
 				if (err) {
-					callback(err);
+					callback.call(context, err);
 					return;
 				}
 
@@ -62,6 +58,7 @@ module.exports = Cube.Class({
 	 * Executes query and provides all results as an array.
 	 *
 	 * @param {Function} callback function has two arguments: errors and query results.
+	 * @param {Object} context
 	 */
 	all: function(callback, context) {
 		this.createCommand().query().all(callback, context);
@@ -73,9 +70,10 @@ module.exports = Cube.Class({
 	 *
 	 * @param {Function} callback function has two arguments: errors and
 	 *     the first column value. Invoked after successfully query.
+	 * @param {Object} context
 	 */
-	scalar: function(callback) {
-		this.createCommand().query().scalar(callback);
+	scalar: function(callback, context) {
+		this.createCommand().query().scalar(callback, context);
 	},
 
 	/**
@@ -83,8 +81,9 @@ module.exports = Cube.Class({
 	 *
 	 * @param {String|Function} q the COUNT expression. Defaults to '*'. May be use as callback function.
 	 * @param {Function} callback function has two arguments: errors and number of records.
+	 * @param {Object} context
 	 */
-	count: function(q, callback) {
+	count: function(q, callback, context) {
 		if (_.isFunction(q)) {
 			callback = q;
 			q = null;
@@ -92,7 +91,7 @@ module.exports = Cube.Class({
 
 		//	TODO: Security
 		this.builder.select('COUNT(' + (q ? q : '*') + ')');
-		this.createCommand().query().scalar(callback);
+		this.createCommand().query().scalar(callback, context);
 	},
 
 	/**
@@ -101,8 +100,9 @@ module.exports = Cube.Class({
 	 * @param {String} q the column name or expression.
 	 * @param {Function} callback function has two arguments: errors and
 	 *     the sum of the specified column values.
+	 * @param {Object} context
 	 */
-	sum: function(q, callback) {
+	sum: function(q, callback, context) {
 		//	TODO: Expression and security
 		if (!q) {
 			callback('No column name for sum!');
@@ -111,7 +111,7 @@ module.exports = Cube.Class({
 
 		//	TODO: Security
 		this.builder.select('SUM(' + q + ')');
-		this.createCommand().query().scalar(callback);
+		this.createCommand().query().scalar(callback, context);
 	},
 
 	/**
@@ -120,8 +120,9 @@ module.exports = Cube.Class({
 	 * @param {String} q the column name or expression.
 	 * @param {Function} callback function has two arguments: errors and
 	 *     the average of the specified column values.
+	 * @param {Object} context
 	 */
-	average: function(q, callback) {
+	average: function(q, callback, context) {
 		//	TODO: Expression and security
 		if (!q) {
 			callback('No column name for average!');
@@ -130,7 +131,7 @@ module.exports = Cube.Class({
 
 		//	TODO: Security
 		this.builder.select('AVG(' + q + ')');
-		this.createCommand().query().scalar(callback);
+		this.createCommand().query().scalar(callback, context);
 	},
 
 	/**
@@ -139,8 +140,9 @@ module.exports = Cube.Class({
 	 * @param {String} q the column name or expression.
 	 * @param {Function} callback function has two arguments: errors and
 	 *     the minimum of the specified column values.
+	 * @param {Object} context
 	 */
-	min: function(q, callback) {
+	min: function(q, callback, context) {
 		//	TODO: Expression and security
 		if (!q) {
 			callback('No column name for min!');
@@ -149,7 +151,7 @@ module.exports = Cube.Class({
 
 		//	TODO: Security
 		this.builder.select('MIN(' + q + ')');
-		this.createCommand().query().scalar(callback);
+		this.createCommand().query().scalar(callback, context);
 	},
 
 	/**
@@ -158,8 +160,9 @@ module.exports = Cube.Class({
 	 * @param {String} q the column name (TODO: or expression).
 	 * @param {Function} callback function has two arguments: errors and
 	 *     the maximum of the specified column values.
+	 * @param {Object} context
 	 */
-	max: function(q, callback) {
+	max: function(q, callback, context) {
 		//	TODO: Expression and security
 		if (!q) {
 			callback('No column name for max!');
@@ -168,7 +171,7 @@ module.exports = Cube.Class({
 
 		//	TODO: Security
 		this.builder.select('MAX(' + q + ')');
-		this.createCommand().query().scalar(callback);
+		this.createCommand().query().scalar(callback, context);
 	},
 
 	/**

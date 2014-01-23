@@ -192,7 +192,7 @@ module.exports = Cube.Singleton({
 	 */
 	create: function(name) {
 		/**
-		 * Create model.
+		 * Create a model.
 		 *
 		 * @param driver
 		 * @return {ActiveRecord}
@@ -215,13 +215,13 @@ module.exports = Cube.Singleton({
 		/**
 		 * Set and get model.
 		 *
-		 * @type {function(this:exports)}
+		 * @param {String} database database's name.
+		 * @param {Object} activeRecord parent active record.
+		 * @param {Object} modelData data of active record.
+		 * @param {Function} callback
+		 * @param {Object} context
 		 */
 		var GetSet = function(database, activeRecord, modelData, callback, context) {
-			if (!context) {
-				context = this;
-			}
-
 			var model = this.getModel(database, name);
 			if (model) {
 				callback.call(context, null, model);
