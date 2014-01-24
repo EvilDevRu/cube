@@ -106,12 +106,12 @@ module.exports = Cube.Singleton({
 			 */
 			var TemplateEngine = function() {
 				switch (config.template.type.toLowerCase()) {
-/*					case 'dot':
+					case 'dot':
 						that.private.express.set('view engine', '.html');
 						that.private.express.engine('.html', require('express-dot').__express);
-						break;*/
+						break;
 
-					case 'ect':
+					case 'ectjs':
 						//	TODO: read params from config.
 						var ECT = require('ect');
 						that.private.express.set('view engine', '.ect');
@@ -123,7 +123,7 @@ module.exports = Cube.Singleton({
 
 					default:
 						//	TODO: Throw
-						console.log('Template engine is invalid');
+						console.error('Template engine is invalid');
 						break;
 				}
 
